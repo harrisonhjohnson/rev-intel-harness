@@ -1,0 +1,12 @@
+{
+  "name": "rev-intel-harness",
+  "version": "0.1.0",
+  "description": "Lease-based enrichment queue treating coding agents as interchangeable revenue-intelligence workers, with provenance and an honest cost ledger.",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}

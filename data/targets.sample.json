@@ -1,0 +1,7 @@
+{
+  "targets": [
+    { "key": "acme-widgets", "name": "Acme Widgets", "domain": "acmewidgets.example.com", "notes": "DTC hardware, ~20 people" },
+    { "key": "northside-hvac", "name": "Northside HVAC", "domain": "northsidehvac.example.com", "notes": "regional trades, owner-operated" },
+    { "key": "glowlab", "name": "GlowLab", "domain": "glowlab.example.com", "notes": "beauty brand, recently raised" }
+  ]
+}
