@@ -50,6 +50,15 @@ async function getTarget(key) {
 
 const server = createServer(async (req, res) => {
   try {
+    // Local tool, local surface: browsers send an Origin header on cross-site
+    // requests; curl and the lanes don't. Rejecting it blocks drive-by CSRF
+    // POSTs from a malicious webpage to localhost.
+    if (req.headers.origin) {
+      return send(res, 403, { error: "Browser cross-origin requests are not accepted." });
+    }
+    if (req.method === "POST" && !String(req.headers["content-type"] || "").includes("application/json")) {
+      return send(res, 415, { error: "content-type must be application/json." });
+    }
     /* ---- queue: workers pull leases ---- */
     if (req.url.startsWith("/api/queue") && req.method === "GET") {
       const u = new URL(req.url, "http://x");
@@ -163,7 +172,10 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
+// Loopback only — the queue and ingest are unauthenticated by design, so they
+// must never be reachable from the network. Front with your own auth if you
+// genuinely need remote workers.
+server.listen(PORT, process.env.HARNESS_HOST || "127.0.0.1", () => {
   console.log(`rev-intel-harness on http://localhost:${PORT}`);
   console.log(`  targets: data/targets.json · results overlay: data/enrichment.json · ledger: data/usage-ledger.jsonl`);
 });

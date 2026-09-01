@@ -10,6 +10,7 @@ import { execFileSync, spawn } from "node:child_process";
 import { readFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir, homedir } from "node:os";
+import { randomUUID } from "node:crypto";
 
 const JOB_TIMEOUT_MS = 9 * 60 * 1000; // 6 min timed out ~16% of jobs; deep-research targets need the headroom
 
@@ -87,7 +88,9 @@ export function createRunners({ __dirname, PORT, loadSettings }) {
       label: "Codex",
       model: (s) => s.workers?.codexModel || null, // null → Codex config default
       async exec(prompt, model) {
-        const outFile = join(tmpdir(), "harness-codex-" + Date.now().toString(36) + ".json");
+        // Unpredictable name: a guessable path in a shared tmpdir invites
+        // symlink/pre-creation games from other local users.
+        const outFile = join(tmpdir(), "harness-codex-" + randomUUID() + ".json");
         // --ignore-user-config: a user config.toml can define MCP servers whose
         // OAuth re-fires on every ephemeral exec. A `-c mcp_servers={}` override
         // MERGES tables (no-op), so skip the config file entirely — auth still
