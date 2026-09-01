@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rev-intel-harness — coding agents as enrichment workers</title>
+<meta name="description" content="An open-source revenue-intelligence harness: a lease-based enrichment queue that treats coding agents as interchangeable research workers, with provenance and an honest cost ledger.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23F4F8F3'/%3E%3Crect y='4' width='16' height='4' fill='%23E3EEE2'/%3E%3Crect y='12' width='16' height='4' fill='%23E3EEE2'/%3E%3Ctext x='2' y='12' font-family='monospace' font-size='11' font-weight='bold' fill='%231D2C24'%3Er%3E%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F4F8F3;
+    --band: #E3EEE2;
+    --ink: #1D2C24;
+    --ink-soft: #56685D;
+    --rule: #C2D4C1;
+    --red: #A32B1C;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --serif: "Source Serif 4", Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    line-height: 1.65;
+    /* greenbar: 4-line bands, like tractor-feed printer paper */
+    background-color: var(--paper);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--paper) 0, var(--paper) 3.3rem,
+      var(--band) 3.3rem, var(--band) 6.6rem
+    );
+  }
+  /* tractor-feed sprocket holes down both margins */
+  .feed {
+    position: fixed; top: 0; bottom: 0; width: 2.2rem; z-index: 2;
+    background-image: radial-gradient(circle at center, #fff 0.28rem, #D7E3D6 0.34rem, transparent 0.42rem);
+    background-size: 2.2rem 2.2rem;
+    background-repeat: repeat-y;
+    background-position: center 1rem;
+    pointer-events: none;
+  }
+  .feed.left  { left: 0;  border-right: 1px dashed var(--rule); }
+  .feed.right { right: 0; border-left: 1px dashed var(--rule); }
+
+  .page { max-width: 46rem; margin: 0 auto; padding: 3.3rem 3.4rem 6.6rem; }
+
+  a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--red); }
+  a:focus-visible, .btn:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+
+  /* --- job banner hero --- */
+  .banner {
+    font-family: var(--mono);
+    white-space: pre;
+    overflow-x: auto;
+    font-size: clamp(0.42rem, 1.55vw, 0.72rem);
+    line-height: 1.25;
+    font-weight: 700;
+    margin: 0 0 2rem;
+  }
+  .jobline {
+    font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.06em;
+    color: var(--ink-soft); text-transform: uppercase;
+    border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+    padding: 0.35rem 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem;
+    margin-bottom: 2.4rem;
+  }
+  .jobline .cost { color: var(--red); }
+
+  h1, h2 { font-family: var(--mono); letter-spacing: -0.01em; }
+  .lede { font-size: 1.32rem; line-height: 1.5; font-weight: 400; max-width: 38rem; margin: 0 0 1.2rem; }
+  .lede strong { font-weight: 600; }
+
+  .ctas { display: flex; gap: 0.9rem; flex-wrap: wrap; margin: 1.8rem 0 3.8rem; }
+  .btn {
+    font-family: var(--mono); font-size: 0.88rem; font-weight: 500;
+    text-decoration: none; padding: 0.55rem 1.1rem;
+    border: 1.5px solid var(--ink); color: var(--ink); background: #fff;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 80ms ease, box-shadow 80ms ease;
+  }
+  .btn:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--ink); color: var(--ink); }
+  .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn.primary:hover { color: var(--paper); }
+
+  h2 {
+    font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em;
+    margin: 3.6rem 0 1rem; padding-top: 0.6rem;
+    border-top: 2px solid var(--ink);
+  }
+  h2 .pageno { float: right; color: var(--ink-soft); font-weight: 400; }
+
+  p { max-width: 38rem; }
+  .note { color: var(--ink-soft); font-size: 0.92rem; }
+
+  /* --- transcript / code blocks: white card so bands don't fight the text --- */
+  pre.term {
+    font-family: var(--mono); font-size: 0.8rem; line-height: 1.55;
+    background: #fff; border: 1px solid var(--rule);
+    box-shadow: 4px 4px 0 var(--band);
+    padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0;
+  }
+  pre.term .c  { color: var(--ink-soft); }   /* comment */
+  pre.term .r  { color: var(--red); }        /* rejection / cost */
+  pre.term .p  { font-weight: 700; }         /* prompt $ */
+
+  /* --- lanes table --- */
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 1.4rem 0; background: #fff; border: 1px solid var(--rule); }
+  th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-soft); font-weight: 500; }
+  td:first-child { font-family: var(--mono); font-size: 0.82rem; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  /* --- design decisions as ledger entries --- */
+  .ledger { list-style: none; padding: 0; margin: 1.4rem 0; max-width: 40rem; }
+  .ledger li { padding: 0.9rem 0; border-bottom: 1px dashed var(--rule); }
+  .ledger .k { font-family: var(--mono); font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 0.15rem; }
+  .ledger .k::before { content: "▸ "; color: var(--red); }
+
+  footer {
+    margin-top: 4.4rem; padding-top: 1rem; border-top: 2px solid var(--ink);
+    font-family: var(--mono); font-size: 0.78rem; color: var(--ink-soft);
+    display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem;
+  }
+  footer a { color: var(--ink-soft); }
+
+  @media (max-width: 720px) {
+    .feed { display: none; }
+    .page { padding: 2.2rem 1.2rem 4.4rem; }
+    .lede { font-size: 1.15rem; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .print-in { animation: feed-in 420ms ease-out backwards; }
+    .print-in:nth-child(2) { animation-delay: 90ms; }
+    .print-in:nth-child(3) { animation-delay: 180ms; }
+    .print-in:nth-child(4) { animation-delay: 270ms; }
+    @keyframes feed-in { from { opacity: 0; transform: translateY(0.6rem); } to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+<div class="feed left" aria-hidden="true"></div>
+<div class="feed right" aria-hidden="true"></div>
+
+<main class="page">
+  <pre class="banner print-in" role="img" aria-label="rev-intel-harness">
+██████  ███████ ██    ██         ██ ███    ██ ████████ ███████ ██
+██   ██ ██      ██    ██         ██ ████   ██    ██    ██      ██
+██████  █████   ██    ██ ███████ ██ ██ ██  ██    ██    █████   ██
+██   ██ ██       ██  ██          ██ ██  ██ ██    ██    ██      ██
+██   ██ ███████   ████           ██ ██   ████    ██    ███████ ███████
+
+██   ██  █████  ██████  ███    ██ ███████ ███████ ███████
+██   ██ ██   ██ ██   ██ ████   ██ ██      ██      ██
+███████ ███████ ██████  ██ ██  ██ █████   ███████ ███████
+██   ██ ██   ██ ██   ██ ██  ██ ██ ██           ██      ██
+██   ██ ██   ██ ██   ██ ██   ████ ███████ ███████ ███████</pre>
+
+  <div class="jobline print-in">
+    <span>*** JOB: ENRICH ***</span>
+    <span>TARGETS: ~1,000</span>
+    <span class="cost">MARGINAL CASH: SINGLE-DIGIT $</span>
+    <span>LICENSE: MIT</span>
+  </div>
+
+  <p class="lede print-in">A lease-based enrichment queue that treats coding agents — Claude&nbsp;Code, Codex, <em>or you pasting into a chat UI</em> — as <strong>interchangeable revenue-intelligence workers</strong> behind one evidence-gated ingest contract, with per-source provenance and an honest cost ledger.</p>
+
+  <p class="print-in">Contact enrichment is a research task, and research is what agentic CLIs are quietly excellent at. Vendors price enrichment per row; raw API calls with web search cost real money at volume. The harness routes the work to agent subscriptions you already pay for — and meters everything, so you know it's actually cheaper.</p>
+
+  <div class="ctas">
+    <a class="btn primary" href="https://github.com/harrisonhjohnson/rev-intel-harness">Read the code on GitHub</a>
+    <a class="btn" href="#run">Run it in five minutes</a>
+  </div>
+
+  <h2 id="how">How a run reads <span class="pageno">P.01</span></h2>
+  <p>No database, no framework, no queue service. Three ~150-line Node modules, JSON files, curl. Every lane pulls from the same queue and posts to the same ingest endpoint — so swapping agent runtimes is a config change, and a human with a chat tab is a first-class worker.</p>
+
+  <pre class="term"><span class="p">$</span> curl -s "localhost:4400/api/queue?limit=1&amp;worker=claude-code"
+{ "rows": [ { "key": "glowlab", "domain": "glowlab.example.com" } ] }
+<span class="c"># … agent researches the company on the open web …</span>
+<span class="p">$</span> curl -s -X POST localhost:4400/api/ingest -d @result.json
+<span class="r">{ "error": "sources[] is required — no evidence, no ingest." }</span>
+<span class="p">$</span> curl -s -X POST localhost:4400/api/ingest -d @result-with-sources.json
+{ "ok": true, "key": "glowlab" }
+<span class="p">$</span> tail -1 data/usage-ledger.jsonl
+{ "site": "enrich", "source": "claude-code", "actual": { <span class="r">"usd": 0</span> }, "ok": true }</pre>
+
+  <h2 id="lanes">Three lanes, one contract <span class="pageno">P.02</span></h2>
+  <table>
+    <thead><tr><th>Lane</th><th>Runtime</th><th>Marginal cost</th></tr></thead>
+    <tbody>
+      <tr><td>claude-code</td><td>Headless <code>claude -p</code>, web search only, model pinned</td><td>$0 on a flat-rate plan</td></tr>
+      <tr><td>codex</td><td><code>codex exec</code>, ephemeral, schema-constrained output</td><td>$0 on a flat-rate plan</td></tr>
+      <tr><td>manual</td><td>You, pasting the brief into any capable assistant</td><td>whatever you already pay</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Leases last 30 minutes and free themselves; a failed job needs no retry logic — the next worker simply picks it up.</p>
+
+  <h2 id="decisions">Decisions that earned their place <span class="pageno">P.03</span></h2>
+  <p>Extracted from a real GTM engagement, where it enriched ~1,000 companies — researched contact, firmographics, a specific outreach hook, cited sources — for single-digit dollars of marginal cash. Most of these rules come from getting burned:</p>
+  <ul class="ledger">
+    <li><span class="k">No evidence, no ingest.</span> <code>sources[]</code> is enforced at the API layer, not the prompt layer. Models comply with prompts most of the time; validators comply always.</li>
+    <li><span class="k">Email honesty is a type.</span> <code>published | pattern-guess | not-found</code> lives in the schema, so a guess can never masquerade as a verified address downstream.</li>
+    <li><span class="k">The claim happens inside the mutex.</span> The free-list comes from a stale read; check-and-set runs inside the serialized store, or two workers enrich the same company. This happened.</li>
+    <li><span class="k">Enrichment is an overlay.</span> Results never mutate the target list; provenance — which lane, which model, when — rides on every record.</li>
+    <li><span class="k">The meter is a feature.</span> Every unit of work lands in an append-only ledger with expected-vs-actual cost. Subscription work logs at <span style="color:var(--red)">$0</span>, so cash spend and free spend sit side by side.</li>
+    <li><span class="k">Pin models in unattended runs.</span> A scheduled worker never inherits an interactive session's model choice.</li>
+  </ul>
+
+  <h2 id="run">Run it <span class="pageno">P.04</span></h2>
+  <p>Bring your own agents — a Claude Code and/or Codex CLI, logged in on whatever plan or key you have. The harness itself calls no APIs and holds no keys, and it binds to loopback only.</p>
+  <pre class="term"><span class="p">$</span> git clone https://github.com/harrisonhjohnson/rev-intel-harness && cd rev-intel-harness
+<span class="p">$</span> cp data/targets.sample.json data/targets.json   <span class="c"># then edit: your companies</span>
+<span class="p">$</span> $EDITOR workers/enrich-prompt.md                <span class="c"># aim the hooks at your ICP</span>
+<span class="p">$</span> node server.mjs
+<span class="p">$</span> curl -s -X POST localhost:4400/api/workers/run -H "content-type: application/json" -d '{"n":4}'
+<span class="p">$</span> curl -s localhost:4400/api/results | jq '.rows[] | select(.enrichment)'</pre>
+  <p class="note">It stops at researched, cited, provenance-stamped records — deliberately. What you send, and whether a pattern-guess email ever gets used unverified, is outside its scope. Respect robots, rate limits, and the law downstream.</p>
+
+  <footer>
+    <span>REV-INTEL-HARNESS · MIT</span>
+    <a href="https://github.com/harrisonhjohnson/rev-intel-harness">github</a>
+    <a href="https://harrison.build">harrison.build</a>
+    <span>built with Claude — the design calls and the scar tissue are human</span>
+  </footer>
+</main>
+</body>
+</html>
