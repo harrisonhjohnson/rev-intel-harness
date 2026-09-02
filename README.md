@@ -1,6 +1,6 @@
-# Gramercy
+# Rev-Intel Harness
 
-**A CSV of companies in; the people out.** Gramercy points the AI subscriptions you
+**A CSV of companies in; the people out.** Rev-Intel Harness points the AI subscriptions you
 already pay for — Claude Code, Codex, or you pasting into a chat tab — at your list of
 target companies and researches each one: a named decision-maker, title, email (honestly
 labeled), LinkedIn, firmographics, a specific reason to reach out, and the sources for
@@ -8,13 +8,13 @@ every claim. Then it hands you a CSV back.
 
 You have the list. You have the subscription. The enrichment vendors want to charge you
 per row for what is, underneath, web research — and you already pay for a tireless web
-researcher. Gramercy is the missing harness: local, open source, MIT, and it calls no
+researcher. It is the missing harness: local, open source, MIT, and it calls no
 APIs and holds no keys of its own.
 
 ## Sixty seconds to running
 
 ```bash
-git clone https://github.com/harrisonhjohnson/gramercy && cd gramercy && node setup.mjs
+git clone https://github.com/harrisonhjohnson/rev-intel-harness && cd rev-intel-harness && node setup.mjs
 ```
 
 Setup asks two questions: where your CSV is, and your company's URL (or one line on who
@@ -22,7 +22,11 @@ you sell to). Your own Claude reads your site and writes your **kernel** — the
 context every research run carries, so the researcher knows who it's working for, which
 personas matter, and what a good hook sounds like. Edit `data/kernel.md` any time.
 
-Then:
+**Using Claude Code?** The repo ships a skill: open `claude` in the cloned directory and
+type `/enrich` — your agent runs setup, dispatches workers, and hands you the enriched
+CSV with an honest cost and email-label summary.
+
+Then (or by hand):
 
 ```bash
 node server.mjs
@@ -35,7 +39,7 @@ curl -s localhost:4400/api/results.csv > enriched.csv
 Every unit of work lands in an append-only ledger (`data/usage-ledger.jsonl`) with
 expected-vs-actual cost. Work done by your flat-rate subscriptions logs at **$0**, so cash
 spend and free spend sit side by side. This is a principle, not a dashboard feature: if
-Gramercy quietly burned through your plan's limits, you'd have been better off paying the
+the harness quietly burned through your plan's limits, you'd have been better off paying the
 enrichment vendor — so the meter is always on, and honest. In real use it enriched ~1,000
 companies for single-digit dollars of marginal cash.
 
@@ -77,7 +81,7 @@ worker picks it up.
 
 ## What is not included
 
-Gramercy is honest to the point of bluntness, because the alternative is you getting
+The harness is honest to the point of bluntness, because the alternative is you getting
 burned:
 
 - **It does not verify emails.** It finds published addresses (`emailBasis: "published"`)
@@ -120,8 +124,5 @@ before you run it.
 Built by [Harrison Johnson](https://harrison.build) with Claude — the AI did the legwork,
 the design calls and the scar tissue are human. Extracted and genericized from a private
 prospecting desk; no client data, prompts, or ICP ships here.
-
-*Gramercy: from "grant mercy" — an old way of saying thank you. Also the quiet park in
-the middle of the city that you need your own key to enter.*
 
 MIT licensed.

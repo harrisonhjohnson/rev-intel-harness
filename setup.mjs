@@ -1,4 +1,4 @@
-/* Gramercy setup — the 60-second path.
+/* Rev-Intel Harness setup — the 60-second path.
    Imports your CSV of companies and writes your kernel (the ICP context every
    research run carries). Interactive by default; flags make it scriptable:
      node setup.mjs --csv leads.csv --url https://yourco.com
@@ -113,7 +113,7 @@ async function deriveKernelFromUrl(url, model) {
 /* ---- main ---- */
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 try {
-  console.log("Gramercy setup — a CSV of companies in, your kernel written, ready to run.\n");
+  console.log("Rev-Intel Harness setup — a CSV of companies in, your kernel written, ready to run.\n");
 
   let csvPath = args.csv;
   while (!csvPath) csvPath = (await rl.question("Path to your CSV of companies: ")).trim();
@@ -132,7 +132,7 @@ try {
       kernel = await deriveKernelFromUrl(ans, args.model);
     } else kernel = ans;
   }
-  if (!kernel) throw new Error("Gramercy needs a kernel — the researcher has to know who it's working for.");
+  if (!kernel) throw new Error("The harness needs a kernel — the researcher has to know who it's working for.");
 
   await mkdir(DATA_DIR, { recursive: true });
   await writeFile(join(DATA_DIR, "kernel.md"), kernel + "\n");

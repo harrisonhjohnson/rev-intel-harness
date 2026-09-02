@@ -1,5 +1,5 @@
 {
-  "name": "gramercy",
+  "name": "rev-intel-harness",
   "version": "0.1.0",
   "description": "Point it at a CSV of companies and your own AI subscriptions find the people. Local, evidence-gated, cost-ledgered.",
   "type": "module",

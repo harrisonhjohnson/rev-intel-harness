@@ -1,5 +1,5 @@
 #!/bin/bash
-# Gramercy enrichment worker — Claude Code lane, standalone.
+# Rev-Intel Harness enrichment worker — Claude Code lane, standalone.
 # Runs on a flat-rate subscription ($0 marginal cash); the model is PINNED so a
 # scheduled run never silently inherits whatever the interactive session uses.
 # Usage: ./workers/enrich-worker.sh [N]   # default 10 targets
@@ -7,8 +7,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 N="${1:-10}"
-BASE="${GRAMERCY_BASE:-http://localhost:4400}"
-MODEL="${GRAMERCY_WORKER_MODEL:-claude-sonnet-5}"
+BASE="${HARNESS_BASE:-http://localhost:4400}"
+MODEL="${HARNESS_WORKER_MODEL:-claude-sonnet-5}"
 PROMPT_FILE="workers/enrich-prompt.md"
 KERNEL=""
 [ -f data/kernel.md ] && KERNEL=$(printf '\n\nCONTEXT — WHO YOU ARE RESEARCHING FOR (the user'\''s kernel):\n%s\n' "$(cat data/kernel.md)")

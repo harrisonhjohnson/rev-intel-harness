@@ -14,7 +14,7 @@ import { createRunners } from "./runners.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, "data");
-const PORT = Number(process.env.GRAMERCY_PORT || 4400);
+const PORT = Number(process.env.HARNESS_PORT || 4400);
 const LEASE_MS = 30 * 60 * 1000;
 
 const targetsStore = createStore(join(DATA_DIR, "targets.json"), { targets: [] });
@@ -182,7 +182,7 @@ const server = createServer(async (req, res) => {
     }
 
     if (req.url === "/" && req.method === "GET") {
-      return send(res, 200, "gramercy — see README. Endpoints: GET /api/queue · POST /api/ingest · POST /api/workers/run · GET /api/workers/status · GET /api/results · GET /api/results.csv · GET /api/usage\n", "text/plain");
+      return send(res, 200, "rev-intel-harness — see README. Endpoints: GET /api/queue · POST /api/ingest · POST /api/workers/run · GET /api/workers/status · GET /api/results · GET /api/results.csv · GET /api/usage\n", "text/plain");
     }
     return send(res, 404, { error: "Not found" });
   } catch (err) {
@@ -195,7 +195,7 @@ const server = createServer(async (req, res) => {
 // Loopback only — the queue and ingest are unauthenticated by design, so they
 // must never be reachable from the network. Front with your own auth if you
 // genuinely need remote workers.
-server.listen(PORT, process.env.GRAMERCY_HOST || "127.0.0.1", () => {
-  console.log(`gramercy on http://localhost:${PORT}`);
+server.listen(PORT, process.env.HARNESS_HOST || "127.0.0.1", () => {
+  console.log(`rev-intel-harness on http://localhost:${PORT}`);
   console.log(`  targets: data/targets.json · results overlay: data/enrichment.json · ledger: data/usage-ledger.jsonl`);
 });

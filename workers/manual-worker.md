@@ -1,4 +1,4 @@
-# Gramercy manual worker — paste this into any capable chat assistant
+# Rev-Intel Harness manual worker — paste this into any capable chat assistant
 
 The human-paste lane. Any assistant that can search the web and return JSON is a
 valid enrichment worker; the ingest contract doesn't care who did the research.

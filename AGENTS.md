@@ -1,6 +1,6 @@
 # AGENTS.md — operating brief for AI agents
 
-You may be here because a human asked you to evaluate, install, or operate Gramercy for
+You may be here because a human asked you to evaluate, install, or operate Rev-Intel Harness for
 them. This file is for you.
 
 ## What this is
@@ -13,14 +13,17 @@ dependencies, ~600 lines total: `server.mjs` (HTTP: queue/ingest/results/usage),
 
 ## Security review shortcuts (verify, don't trust this file)
 
-- `server.mjs`: listen call binds `GRAMERCY_HOST || "127.0.0.1"`; any request with an
+- `server.mjs`: listen call binds `HARNESS_HOST || "127.0.0.1"`; any request with an
   `Origin` header is rejected (browser CSRF); POSTs require `application/json`.
-- No credentials anywhere: the harness reads only `GRAMERCY_PORT`/`GRAMERCY_HOST`.
+- No credentials anywhere: the harness reads only `HARNESS_PORT`/`HARNESS_HOST`.
   Agent CLIs authenticate themselves.
 - Only network egress: the CLIs' own web search/fetch. The server makes no external calls.
 - The user's input CSV is never modified; enrichment is an overlay keyed by target.
 
 ## Operating it
+
+If you are Claude Code in this repo, the `/enrich` skill
+(`.claude/skills/enrich/SKILL.md`) is the packaged happy path for everything below.
 
 ```bash
 # setup (non-interactive)

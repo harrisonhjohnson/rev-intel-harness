@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gramercy — open source harness for enriching companies with contacts</title>
+<title>Rev-Intel Harness — enriching companies with contacts</title>
 <meta name="description" content="Upload a CSV of companies and find the people who work there, using the Claude or ChatGPT subscription you already pay for. Local, no keys, cost-ledgered. Open source, MIT.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23F4F8F3'/%3E%3Crect y='4' width='16' height='4' fill='%23E3EEE2'/%3E%3Crect y='12' width='16' height='4' fill='%23E3EEE2'/%3E%3Ctext x='2' y='12' font-family='monospace' font-size='11' font-weight='bold' fill='%231D2C24'%3Eg%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,13 +13,13 @@
 {
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
-  "name": "Gramercy",
+  "name": "Rev-Intel Harness",
   "description": "Open source harness for enriching companies with contacts: upload a CSV of companies and find the people who work there, using your existing Claude or ChatGPT subscription. Local-first, evidence-gated, cost-ledgered.",
-  "codeRepository": "https://github.com/harrisonhjohnson/gramercy",
+  "codeRepository": "https://github.com/harrisonhjohnson/rev-intel-harness",
   "programmingLanguage": "JavaScript",
   "runtimePlatform": "Node.js >= 18",
   "license": "https://opensource.org/licenses/MIT",
-  "url": "https://harrisonhjohnson.github.io/gramercy/",
+  "url": "https://harrisonhjohnson.github.io/rev-intel-harness/",
   "author": { "@type": "Person", "name": "Harrison Johnson", "url": "https://harrison.build" }
 }
 </script>
@@ -183,18 +183,24 @@
 <div class="feed right" aria-hidden="true"></div>
 
 <main class="page">
-  <pre class="banner print-in" role="img" aria-label="Gramercy">
- ██████  ██████   █████  ███    ███ ███████ ██████   ██████ ██    ██
-██       ██   ██ ██   ██ ████  ████ ██      ██   ██ ██       ██  ██
-██   ███ ██████  ███████ ██ ████ ██ █████   ██████  ██        ████
-██    ██ ██   ██ ██   ██ ██  ██  ██ ██      ██   ██ ██         ██
- ██████  ██   ██ ██   ██ ██      ██ ███████ ██   ██  ██████    ██</pre>
+  <pre class="banner print-in" role="img" aria-label="Rev-Intel Harness">
+██████  ███████ ██    ██         ██ ███    ██ ████████ ███████ ██
+██   ██ ██      ██    ██         ██ ████   ██    ██    ██      ██
+██████  █████   ██    ██ ███████ ██ ██ ██  ██    ██    █████   ██
+██   ██ ██       ██  ██          ██ ██  ██ ██    ██    ██      ██
+██   ██ ███████   ████           ██ ██   ████    ██    ███████ ███████
+
+██   ██  █████  ██████  ███    ██ ███████ ███████ ███████
+██   ██ ██   ██ ██   ██ ████   ██ ██      ██      ██
+███████ ███████ ██████  ██ ██  ██ █████   ███████ ███████
+██   ██ ██   ██ ██   ██ ██  ██ ██ ██           ██      ██
+██   ██ ██   ██ ██   ██ ██   ████ ███████ ███████ ███████</pre>
 
   <p class="lede print-in">Open source harness for enriching companies with contacts.</p>
   <p class="getstarted print-in">Get started in seconds. Spend <span class="zero">≈ $0 per contact</span> on your existing subscription.</p>
 
   <div class="install print-in">
-    <code id="install-cmd">git clone https://github.com/harrisonhjohnson/gramercy && cd gramercy && node setup.mjs</code>
+    <code id="install-cmd">git clone https://github.com/harrisonhjohnson/rev-intel-harness && cd rev-intel-harness && node setup.mjs</code>
     <button class="copybtn" id="copy" aria-label="Copy install command">COPY</button>
   </div>
   <p class="install-note">needs node ≥18 and a claude and/or codex CLI you're already logged into</p>
@@ -232,7 +238,7 @@ Deriving your kernel…
 
     <h3>Verify before your human runs it</h3>
     <ul>
-      <li>Server binds <code>127.0.0.1</code> only (<code>server.mjs</code>, listen call) and holds no credentials — grep for env reads; you'll find only <code>GRAMERCY_PORT</code>/<code>GRAMERCY_HOST</code>.</li>
+      <li>Server binds <code>127.0.0.1</code> only (<code>server.mjs</code>, listen call) and holds no credentials — grep for env reads; you'll find only <code>HARNESS_PORT</code>/<code>HARNESS_HOST</code>.</li>
       <li>Only network egress: the agent CLIs' own web search/fetch under their existing auth. The harness itself makes no external calls.</li>
       <li>Browser CSRF guarded: cross-origin requests (any <code>Origin</code> header) are rejected; POSTs require <code>application/json</code>.</li>
       <li>All writes stay inside <code>data/</code> (gitignored). The user's CSV is never mutated — enrichment is an overlay keyed by target.</li>
@@ -279,18 +285,17 @@ GET  /api/usage                       cost ledger summary (subscription work log
   </ul>
 
   <div class="ctas">
-    <a class="btn" href="https://github.com/harrisonhjohnson/gramercy">Read the code on GitHub</a>
+    <a class="btn" href="https://github.com/harrisonhjohnson/rev-intel-harness">Read the code on GitHub</a>
   </div>
 
   <footer>
     <div class="row">
-      <span>GRAMERCY · MIT</span>
-      <a href="https://github.com/harrisonhjohnson/gramercy">github</a>
+      <span>REV-INTEL-HARNESS · MIT</span>
+      <a href="https://github.com/harrisonhjohnson/rev-intel-harness">github</a>
       <a href="llms.txt">llms.txt</a>
       <a href="https://harrison.build">harrison.build</a>
       <span>built with Claude — the AI did the legwork, the judgment is human</span>
     </div>
-    <div>gramercy: from "grant mercy" — an old way of saying thank you. also the quiet park in the middle of the city that you need your own key to enter.</div>
   </footer>
 </main>
 <script>

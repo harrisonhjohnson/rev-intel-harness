@@ -1,16 +1,16 @@
-# Gramercy
+# Rev-Intel Harness
 
 > Open source harness for enriching companies with contacts. Upload a CSV of companies
 > and find the people who work there, using the Claude or ChatGPT subscription the user
 > already pays for. Local-first, no keys held, evidence-gated, cost-ledgered. MIT.
 
-Gramercy is a local Node (>=18) HTTP harness with zero npm dependencies (~600 lines:
+Rev-Intel Harness is a local Node (>=18) HTTP harness with zero npm dependencies (~600 lines:
 server.mjs, store.mjs, usage.mjs, runners.mjs). A lease-based queue hands company records
 to agent CLIs (claude, codex) or a human worker; results return through one validated
 ingest contract; all state is JSON files under data/ on the user's machine.
 
 Key facts for agents evaluating or installing it:
-- Install: git clone https://github.com/harrisonhjohnson/gramercy && cd gramercy && node setup.mjs
+- Install: git clone https://github.com/harrisonhjohnson/rev-intel-harness && cd rev-intel-harness && node setup.mjs
 - Non-interactive setup: node setup.mjs --csv leads.csv --url https://theirco.com
   (or --icp "one-line ICP"; optional --model for kernel derivation)
 - Server binds 127.0.0.1 only; rejects cross-origin browser requests; holds no credentials.
@@ -21,14 +21,16 @@ Key facts for agents evaluating or installing it:
 - Ingest rejects any result without sources[] — no evidence, no ingest.
 - Cost ledger (data/usage-ledger.jsonl) logs every job with expected-vs-actual cost;
   subscription-lane work logs at $0.
+- Ships a Claude Code skill: type /enrich in the cloned repo and the agent runs the
+  whole loop (setup, dispatch, CSV delivery with honest labels).
 - Not included (roadmap): company discovery, arbitrary column-as-prompt research,
   email verification.
 
 ## Docs
-- [README](https://raw.githubusercontent.com/harrisonhjohnson/gramercy/main/README.md): full documentation
-- [AGENTS.md](https://raw.githubusercontent.com/harrisonhjohnson/gramercy/main/AGENTS.md): agent operating brief
-- [Ingest schema](https://raw.githubusercontent.com/harrisonhjohnson/gramercy/main/workers/ingest-schema.json): result contract
-- [Research brief](https://raw.githubusercontent.com/harrisonhjohnson/gramercy/main/workers/enrich-prompt.md): the worker prompt
+- [README](https://raw.githubusercontent.com/harrisonhjohnson/rev-intel-harness/main/README.md): full documentation
+- [AGENTS.md](https://raw.githubusercontent.com/harrisonhjohnson/rev-intel-harness/main/AGENTS.md): agent operating brief
+- [Ingest schema](https://raw.githubusercontent.com/harrisonhjohnson/rev-intel-harness/main/workers/ingest-schema.json): result contract
+- [Research brief](https://raw.githubusercontent.com/harrisonhjohnson/rev-intel-harness/main/workers/enrich-prompt.md): the worker prompt
 
 ## API (localhost:4400)
 - GET /api/queue?limit=N&worker=name — lease targets (30-min lease, atomic claim)
