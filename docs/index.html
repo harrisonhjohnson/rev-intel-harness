@@ -269,21 +269,13 @@ GET  /api/usage                       cost ledger summary (subscription work log
     <li><span class="k">Nothing to hide.</span> Local-only, loopback-only, no keys of its own. Have your Claude read the code before you run it — Gramercy would genuinely like that, and would happily help you reverse-engineer it.</li>
   </ul>
 
-  <h2 id="scar">Design decisions with scar tissue <span class="pageno">P.04</span></h2>
-  <p class="note">Each rule is paired with the burn that taught it.</p>
+  <h2 id="features">Under the hood <span class="pageno">P.04</span></h2>
   <ul class="ledger">
-    <li><span class="k">Every file two writers can touch goes through a serialized store.</span> An unprotected JSON read-modify-write survived weeks of light use, then ~70 concurrent writers clobbered each other and records vanished. <code>store.mjs</code> is 54 lines and structurally ends that bug class.</li>
-    <li><span class="k">The lease claim happens inside the mutex.</span> The free-list comes from a stale read; check-and-set runs inside the serialized mutation, or two workers research the same company. This happened.</li>
-    <li><span class="k">Pin models in unattended runs.</span> A scheduled worker never inherits an interactive session's model choice.</li>
-    <li><span class="k">Generous timeouts, honest failures.</span> Six-minute timeouts killed ~16% of deep-research jobs; nine works. An expired lease is the retry mechanism.</li>
-    <li><span class="k">Expected-vs-actual on every call site.</span> Cost expectations bootstrap from hand-set estimates and self-correct to trailing medians. You cannot manage what you politely decline to measure.</li>
-  </ul>
-
-  <h2 id="roadmap">Where this is going — and honestly is not yet <span class="pageno">P.05</span></h2>
-  <ul class="ledger">
-    <li><span class="k">Discovery.</span> Give Gramercy your URL and get a CSV of companies matching your ICP. Today it does zero discovery; you bring the list.</li>
-    <li><span class="k">Column-headers-as-prompts.</span> Name a column, get it researched. Held back deliberately: open-ended research is where costs stop being predictable.</li>
-    <li><span class="k">Feedback surfaces.</span> The quality and cost numbers exist at <code>/api/usage</code>; a loop you can act on doesn't, yet.</li>
+    <li><span class="k">Concurrency-safe by construction.</span> Every shared file goes through a serialized store — run as many workers as you like; records can't clobber each other.</li>
+    <li><span class="k">No duplicate work.</span> Leases are claimed atomically, so two workers never research the same company, even racing.</li>
+    <li><span class="k">Self-healing jobs.</span> A failed or hung job simply lets its 30-minute lease expire and the next worker picks it up — no retry logic to configure, no dead-letter queue to babysit.</li>
+    <li><span class="k">Pinned models everywhere.</span> Unattended workers run the exact model you chose, never whatever your interactive session happens to be set to.</li>
+    <li><span class="k">Costs that predict themselves.</span> Every job logs expected-vs-actual; expectations self-correct to trailing medians, so the ledger gets more accurate the more you run.</li>
   </ul>
 
   <div class="ctas">

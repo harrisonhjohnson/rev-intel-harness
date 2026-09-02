@@ -97,37 +97,22 @@ their own auth. The whole thing is ~600 lines of dependency-free Node — if you
 have your Claude read it before you run it, Gramercy would genuinely like that. It has
 nothing to hide and would happily help you reverse-engineer it.
 
-## Design decisions with scar tissue
+## Under the hood
 
-Each of these is a rule paired with the burn that taught it:
-
-- **Every file two writers can touch goes through a serialized store.** An unprotected
-  JSON read-modify-write survived weeks, then ~70 concurrent writers clobbered each other
-  and records vanished. `store.mjs` is 54 lines and structurally ends that bug class.
-- **The lease claim happens inside the mutex.** The free-list comes from a stale read;
-  the check-and-set runs inside the serialized mutation, or two workers research the same
-  company (this happened).
+- **Concurrency-safe by construction.** Every shared file goes through a serialized
+  store (`store.mjs`, 54 lines) — run as many workers as you like; records can't
+  clobber each other.
+- **No duplicate work.** Leases are claimed atomically inside the store's mutation, so
+  two workers never research the same company, even racing.
+- **Self-healing jobs.** A failed or hung job simply lets its 30-minute lease expire and
+  the next worker picks it up — no retry logic to configure, no dead-letter queue to
+  babysit.
 - **Enrichment is an overlay.** Results never mutate your target list; provenance —
   which lane, which model, when — rides on every record.
-- **Pin models in unattended runs.** A scheduled worker never inherits an interactive
-  session's model choice; `--model` is explicit everywhere.
-- **Generous timeouts, honest failures.** Six-minute timeouts killed ~16% of jobs on
-  deep-research targets; nine works. No retry logic, no dead-letter queue — an expired
-  lease is the retry mechanism.
-- **Expected-vs-actual on every call site.** Cost expectations bootstrap from hand-set
-  estimates and self-correct to trailing medians. You cannot manage what you politely
-  decline to measure.
-
-## Where this is going (and honestly is not yet)
-
-- **Discovery** — give Gramercy your URL and get a CSV of companies matching your ICP,
-  not just people for a list you already have. Today it does zero discovery; you bring
-  the list.
-- **Column-headers-as-prompts** — name a column, get it researched. Held back
-  deliberately: open-ended research is where costs stop being predictable, and the
-  evidence gate has to survive user-defined shapes first.
-- **Feedback surfaces** — the quality and cost numbers exist at `/api/usage`; a loop you
-  can act on doesn't, yet.
+- **Pinned models everywhere.** Unattended workers run the exact model you chose
+  (`--model` explicit), never whatever your interactive session happens to be set to.
+- **Costs that predict themselves.** Every job logs expected-vs-actual; expectations
+  self-correct to trailing medians, so the ledger gets more accurate the more you run.
 
 ## Provenance
 
