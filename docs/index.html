@@ -261,12 +261,12 @@ GET  /api/usage                       cost ledger summary (subscription work log
     </ul>
   </div>
 
-  <h2 id="honest">What it will not pretend <span class="pageno">P.03</span></h2>
+  <h2 id="honest">What is not included <span class="pageno">P.03</span></h2>
   <ul class="ledger">
     <li><span class="k">It does not verify emails.</span> Published addresses or pattern guesses, honestly labeled — <code>published</code> or <code>pattern-guess</code> — all the way into your CSV. Verify before you send.</li>
     <li><span class="k">No evidence, no ingest.</span> A result without sources is rejected at the API layer. Models comply with prompts most of the time; validators comply always.</li>
     <li><span class="k">Not a CRM, not a Clay competitor, not an outreach tool.</span> It stops at researched, cited, provenance-stamped records. What you send is outside its scope. Respect robots, rate limits, and the law downstream.</li>
-    <li><span class="k">Nothing to hide.</span> Local-only, loopback-only, no keys of its own. Have your Claude read the code before you run it — Gramercy would genuinely like that, and would happily help you reverse-engineer it.</li>
+    <li><span class="k">No cloud, no account, no keys.</span> Everything runs on your machine — your list, your results, and your kernel never leave it. The only network traffic is your own agents doing web research under their own login. And at ~600 lines of dependency-free code, your Claude can audit the whole thing in one pass before you run it.</li>
   </ul>
 
   <h2 id="features">Under the hood <span class="pageno">P.04</span></h2>

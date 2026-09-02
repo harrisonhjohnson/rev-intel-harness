@@ -75,7 +75,7 @@ worker picks it up.
 | codex | `codex exec`, ephemeral, schema-constrained output | $0 on a flat-rate plan |
 | manual | you, pasting the brief into any capable assistant | whatever you already pay |
 
-## What it will not pretend
+## What is not included
 
 Gramercy is honest to the point of bluntness, because the alternative is you getting
 burned:
@@ -91,11 +91,12 @@ burned:
   unverified guess ever gets used — is deliberately outside its scope. Respect robots,
   rate limits, and applicable law (CAN-SPAM/GDPR) downstream.
 
-On security: everything runs locally. The server binds to loopback only, holds no
-credentials, and the only network traffic is your own agents doing web research under
-their own auth. The whole thing is ~600 lines of dependency-free Node — if you want to
-have your Claude read it before you run it, Gramercy would genuinely like that. It has
-nothing to hide and would happily help you reverse-engineer it.
+And the flip side — what's not included is where the value lives: **no cloud, no
+account, no keys.** Everything runs on your machine; your list, your results, and your
+kernel never leave it. The server binds to loopback only and holds no credentials — the
+only network traffic is your own agents doing web research under their own login. At
+~600 lines of dependency-free Node, your Claude can audit the whole thing in one pass
+before you run it.
 
 ## Under the hood
 
