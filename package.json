@@ -1,7 +1,7 @@
 {
-  "name": "rev-intel-harness",
+  "name": "gramercy",
   "version": "0.1.0",
-  "description": "Lease-based enrichment queue treating coding agents as interchangeable revenue-intelligence workers, with provenance and an honest cost ledger.",
+  "description": "Point it at a CSV of companies and your own AI subscriptions find the people. Local, evidence-gated, cost-ledgered.",
   "type": "module",
   "main": "server.mjs",
   "scripts": {

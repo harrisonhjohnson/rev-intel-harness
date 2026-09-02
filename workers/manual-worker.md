@@ -1,4 +1,4 @@
-# Manual worker — paste this into any capable chat assistant
+# Gramercy manual worker — paste this into any capable chat assistant
 
 The human-paste lane. Any assistant that can search the web and return JSON is a
 valid enrichment worker; the ingest contract doesn't care who did the research.
@@ -9,7 +9,8 @@ valid enrichment worker; the ingest contract doesn't care who did the research.
    curl -s "http://localhost:4400/api/queue?limit=1&worker=manual"
    ```
 
-2. Paste the contents of `enrich-prompt.md`, then the leased row, into your
+2. Paste the contents of `enrich-prompt.md`, then `data/kernel.md`, then the leased
+   row, into your
    assistant of choice. Ask it to return only the JSON object.
 
 3. Post the result back (add your lane name as `source`):

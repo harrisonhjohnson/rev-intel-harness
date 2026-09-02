@@ -1,5 +1,5 @@
 #!/bin/bash
-# Enrichment worker — Claude Code lane, standalone.
+# Gramercy enrichment worker — Claude Code lane, standalone.
 # Runs on a flat-rate subscription ($0 marginal cash); the model is PINNED so a
 # scheduled run never silently inherits whatever the interactive session uses.
 # Usage: ./workers/enrich-worker.sh [N]   # default 10 targets
@@ -7,9 +7,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 N="${1:-10}"
-BASE="${HARNESS_BASE:-http://localhost:4400}"
-MODEL="${HARNESS_WORKER_MODEL:-claude-sonnet-5}"
+BASE="${GRAMERCY_BASE:-http://localhost:4400}"
+MODEL="${GRAMERCY_WORKER_MODEL:-claude-sonnet-5}"
 PROMPT_FILE="workers/enrich-prompt.md"
+KERNEL=""
+[ -f data/kernel.md ] && KERNEL=$(printf '\n\nCONTEXT — WHO YOU ARE RESEARCHING FOR (the user'\''s kernel):\n%s\n' "$(cat data/kernel.md)")
 
 for ((i=1; i<=N; i++)); do
   ROW=$(curl -s -m 15 "$BASE/api/queue?limit=1&worker=claude-code" | node -e '
@@ -25,7 +27,7 @@ let s="";process.stdin.on("data",c=>s+=c).on("end",()=>{
   # positional prompt argument as extra tool patterns.
   # Strict empty MCP config: without it every headless run connects to all the
   # user's MCP servers and can trigger auth prompts.
-  OUT=$(printf '%s\n\nTARGET RECORD:\n%s\n' "$(cat "$PROMPT_FILE")" "$ROW" \
+  OUT=$(printf '%s%s\n\nTARGET RECORD:\n%s\n' "$(cat "$PROMPT_FILE")" "$KERNEL" "$ROW" \
     | claude -p --model "$MODEL" --allowed-tools "WebSearch,WebFetch" \
         --strict-mcp-config --mcp-config '{"mcpServers":{}}' 2>/dev/null || true)
 

@@ -64,7 +64,11 @@ export function createRunners({ __dirname, PORT, loadSettings }) {
 
   async function buildPrompt(row) {
     const brief = await readFile(PROMPT_PATH, "utf8");
-    return brief + "\n\nTARGET RECORD:\n" + JSON.stringify(row) + "\n";
+    let kernel = "";
+    try { kernel = (await readFile(join(__dirname, "data", "kernel.md"), "utf8")).trim(); } catch { /* no kernel yet */ }
+    return brief +
+      (kernel ? "\n\nCONTEXT — WHO YOU ARE RESEARCHING FOR (the user's kernel):\n" + kernel + "\n" : "") +
+      "\n\nTARGET RECORD:\n" + JSON.stringify(row) + "\n";
   }
 
   /* ---- lane adapters: prompt in, ingest-shaped JSON out ---- */
