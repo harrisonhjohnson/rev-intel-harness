@@ -3,12 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gramercy — a CSV of companies in, the people out</title>
-<meta name="description" content="Gramercy points the AI subscriptions you already pay for at your list of target companies and finds the people — with sources, honest email labels, and a cost ledger. Local, open source, MIT.">
+<title>Gramercy — open source harness for enriching companies with contacts</title>
+<meta name="description" content="Upload a CSV of companies and find the people who work there, using the Claude or ChatGPT subscription you already pay for. Local, no keys, cost-ledgered. Open source, MIT.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23F4F8F3'/%3E%3Crect y='4' width='16' height='4' fill='%23E3EEE2'/%3E%3Crect y='12' width='16' height='4' fill='%23E3EEE2'/%3E%3Ctext x='2' y='12' font-family='monospace' font-size='11' font-weight='bold' fill='%231D2C24'%3Eg%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Gramercy",
+  "description": "Open source harness for enriching companies with contacts: upload a CSV of companies and find the people who work there, using your existing Claude or ChatGPT subscription. Local-first, evidence-gated, cost-ledgered.",
+  "codeRepository": "https://github.com/harrisonhjohnson/gramercy",
+  "programmingLanguage": "JavaScript",
+  "runtimePlatform": "Node.js >= 18",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://harrisonhjohnson.github.io/gramercy/",
+  "author": { "@type": "Person", "name": "Harrison Johnson", "url": "https://harrison.build" }
+}
+</script>
 <style>
   :root {
     --paper: #F4F8F3;
@@ -59,24 +73,16 @@
     font-size: clamp(0.4rem, 1.6vw, 0.78rem);
     line-height: 1.25;
     font-weight: 700;
-    margin: 0 0 2rem;
+    margin: 0 0 2.2rem;
   }
-  .jobline {
-    font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.06em;
-    color: var(--ink-soft); text-transform: uppercase;
-    border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
-    padding: 0.35rem 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem;
-    margin-bottom: 2.4rem;
-  }
-  .jobline .cost { color: var(--red); }
 
-  h1, h2 { font-family: var(--mono); letter-spacing: -0.01em; }
-  .lede { font-size: 1.32rem; line-height: 1.5; font-weight: 400; max-width: 38rem; margin: 0 0 1.2rem; }
-  .lede strong { font-weight: 600; }
+  /* ---- the human section: Harrison's copy ---- */
+  .lede { font-size: 1.5rem; line-height: 1.4; font-weight: 600; max-width: 36rem; margin: 0 0 0.5rem; }
+  .getstarted { font-size: 1.12rem; margin: 0 0 1.1rem; max-width: 36rem; }
+  .getstarted .zero { color: var(--red); font-weight: 600; }
 
-  /* install bar: the one action */
   .install {
-    display: flex; align-items: stretch; gap: 0; margin: 1.8rem 0 0.6rem;
+    display: flex; align-items: stretch; gap: 0; margin: 0 0 0.5rem;
     border: 1.5px solid var(--ink); background: #fff;
     box-shadow: 3px 3px 0 var(--ink); max-width: 40rem;
   }
@@ -90,9 +96,58 @@
     background: var(--ink); color: var(--paper); padding: 0 1rem;
   }
   .copybtn:hover { background: var(--red); }
-  .install-note { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-soft); margin: 0 0 3rem; }
+  .install-note { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-soft); margin: 0 0 2.2rem; }
 
-  .ctas { display: flex; gap: 0.9rem; flex-wrap: wrap; margin: 1.4rem 0 0; }
+  .human { list-style: none; padding: 0; margin: 0 0 0.4rem; max-width: 38rem; }
+  .human li {
+    padding: 0.55rem 0; border-bottom: 1px dashed var(--rule);
+    font-size: 1.05rem;
+  }
+  .human li::before { content: "▸ "; color: var(--red); font-family: var(--mono); }
+  .human-gap { height: 1.2rem; }
+
+  h2 {
+    font-family: var(--mono); letter-spacing: 0.08em;
+    font-size: 0.95rem; text-transform: uppercase;
+    margin: 3.6rem 0 1rem; padding-top: 0.6rem;
+    border-top: 2px solid var(--ink);
+  }
+  h2 .pageno { float: right; color: var(--ink-soft); font-weight: 400; }
+
+  p { max-width: 38rem; }
+  .note { color: var(--ink-soft); font-size: 0.92rem; }
+
+  /* ---- the agent section: mono, denser, addressed to the machine ---- */
+  .agent {
+    font-family: var(--mono); font-size: 0.82rem; line-height: 1.6;
+    background: #fff; border: 1.5px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--band);
+    padding: 1.3rem 1.5rem; margin: 1.4rem 0;
+    overflow-x: auto;
+  }
+  .agent h3 { font-size: 0.78rem; letter-spacing: 0.07em; text-transform: uppercase; margin: 1.4rem 0 0.4rem; }
+  .agent h3:first-child { margin-top: 0; }
+  .agent p, .agent ul { max-width: none; margin: 0.3rem 0; }
+  .agent ul { padding-left: 1.2rem; }
+  .agent code, .agent pre { font-family: var(--mono); }
+  .agent pre { margin: 0.5rem 0; padding: 0.6rem 0.8rem; background: var(--paper); border: 1px solid var(--rule); overflow-x: auto; }
+  .agent .r { color: var(--red); }
+
+  pre.term {
+    font-family: var(--mono); font-size: 0.8rem; line-height: 1.55;
+    background: #fff; border: 1px solid var(--rule);
+    box-shadow: 4px 4px 0 var(--band);
+    padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0;
+  }
+  pre.term .c  { color: var(--ink-soft); }
+  pre.term .p  { font-weight: 700; }
+
+  .ledger { list-style: none; padding: 0; margin: 1.4rem 0; max-width: 40rem; }
+  .ledger li { padding: 0.9rem 0; border-bottom: 1px dashed var(--rule); }
+  .ledger .k { font-family: var(--mono); font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 0.15rem; }
+  .ledger .k::before { content: "▸ "; color: var(--red); }
+
+  .ctas { display: flex; gap: 0.9rem; flex-wrap: wrap; margin: 2rem 0 0; }
   .btn {
     font-family: var(--mono); font-size: 0.88rem; font-weight: 500;
     text-decoration: none; padding: 0.55rem 1.1rem;
@@ -102,49 +157,17 @@
   }
   .btn:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--ink); color: var(--ink); }
 
-  h2 {
-    font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em;
-    margin: 3.6rem 0 1rem; padding-top: 0.6rem;
-    border-top: 2px solid var(--ink);
-  }
-  h2 .pageno { float: right; color: var(--ink-soft); font-weight: 400; }
-
-  p { max-width: 38rem; }
-  .note { color: var(--ink-soft); font-size: 0.92rem; }
-
-  pre.term {
-    font-family: var(--mono); font-size: 0.8rem; line-height: 1.55;
-    background: #fff; border: 1px solid var(--rule);
-    box-shadow: 4px 4px 0 var(--band);
-    padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0;
-  }
-  pre.term .c  { color: var(--ink-soft); }
-  pre.term .r  { color: var(--red); }
-  pre.term .p  { font-weight: 700; }
-
-  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 1.4rem 0; background: #fff; border: 1px solid var(--rule); }
-  th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
-  th { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-soft); font-weight: 500; }
-  td:first-child { font-family: var(--mono); font-size: 0.82rem; white-space: nowrap; }
-  tr:last-child td { border-bottom: none; }
-
-  .ledger { list-style: none; padding: 0; margin: 1.4rem 0; max-width: 40rem; }
-  .ledger li { padding: 0.9rem 0; border-bottom: 1px dashed var(--rule); }
-  .ledger .k { font-family: var(--mono); font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 0.15rem; }
-  .ledger .k::before { content: "▸ "; color: var(--red); }
-
   footer {
     margin-top: 4.4rem; padding-top: 1rem; border-top: 2px solid var(--ink);
     font-family: var(--mono); font-size: 0.78rem; color: var(--ink-soft);
   }
   footer .row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; margin-bottom: 0.7rem; }
   footer a { color: var(--ink-soft); }
-  footer .namestory { font-style: normal; }
 
   @media (max-width: 720px) {
     .feed { display: none; }
     .page { padding: 2.2rem 1.2rem 4.4rem; }
-    .lede { font-size: 1.15rem; }
+    .lede { font-size: 1.25rem; }
   }
   @media (prefers-reduced-motion: no-preference) {
     .print-in { animation: feed-in 420ms ease-out backwards; }
@@ -167,75 +190,99 @@
 ██    ██ ██   ██ ██   ██ ██  ██  ██ ██      ██   ██ ██         ██
  ██████  ██   ██ ██   ██ ██      ██ ███████ ██   ██  ██████    ██</pre>
 
-  <div class="jobline print-in">
-    <span>*** JOB: ENRICH ***</span>
-    <span>IN: YOUR CSV</span>
-    <span>OUT: PEOPLE + SOURCES</span>
-    <span class="cost">MARGINAL CASH: ≈ SINGLE-DIGIT $</span>
-  </div>
+  <p class="lede print-in">Open source harness for enriching companies with contacts.</p>
+  <p class="getstarted print-in">Get started in seconds. Spend <span class="zero">≈ $0 per contact</span> on your existing subscription.</p>
 
-  <p class="lede print-in"><strong>A CSV of companies in; the people out.</strong> Gramercy points the AI subscriptions you already pay for at your target list and researches every company — a named decision-maker, an email honestly labeled, a specific reason to reach out, and the sources for every claim.</p>
-
-  <p class="print-in">You have the list. You have the Claude or ChatGPT subscription, mostly idle. The enrichment vendors want to charge you per row for what is, underneath, web research — and you already pay for a tireless web researcher. Gramercy is the missing harness: local, open source, and it holds no keys of its own.</p>
-
-  <div class="install">
+  <div class="install print-in">
     <code id="install-cmd">git clone https://github.com/harrisonhjohnson/gramercy && cd gramercy && node setup.mjs</code>
     <button class="copybtn" id="copy" aria-label="Copy install command">COPY</button>
   </div>
   <p class="install-note">needs node ≥18 and a claude and/or codex CLI you're already logged into</p>
 
-  <h2 id="sixty">Sixty seconds to running <span class="pageno">P.01</span></h2>
-  <p>Setup asks two things: where your CSV is, and your company's URL — or one line on who you sell to. Your own Claude reads your site and writes your <strong>kernel</strong>: the standing context every research run carries, so the researcher knows who it's working for, which personas matter, and what a good hook sounds like. It's a text file. Edit it any time.</p>
+  <ul class="human">
+    <li>Upload a .csv of companies and find people who work there</li>
+    <li>Works with your existing Claude or ChatGPT subscription</li>
+    <li>Tested on ~1,000 companies, designed to maximize token efficiency</li>
+  </ul>
+  <div class="human-gap"></div>
+  <ul class="human">
+    <li>Works locally without any keys</li>
+    <li>Delegates web search to low-cost agents</li>
+    <li>Track your research usage and costs</li>
+    <li>Simple text file system</li>
+    <li>Share your website or describe your ICP</li>
+  </ul>
 
+  <h2 id="sixty">What setup looks like <span class="pageno">P.01</span></h2>
   <pre class="term"><span class="p">$</span> node setup.mjs
 Path to your CSV of companies: <span class="c">leads.csv</span>
 Your company's URL (I'll read it and write your kernel): <span class="c">https://yourco.com</span>
 Deriving your kernel…
-  kernel  → data/kernel.md    <span class="c"># edit any time</span>
+  kernel  → data/kernel.md    <span class="c"># your ICP context — edit any time</span>
   targets → data/targets.json <span class="c">(214 companies)</span>
 <span class="p">$</span> node server.mjs
 <span class="p">$</span> curl -s -X POST localhost:4400/api/workers/run -H "content-type: application/json" -d '{"n":25}'
 <span class="p">$</span> curl -s localhost:4400/api/results.csv > enriched.csv</pre>
 
-  <h2 id="cost">What it costs — and how you know <span class="pageno">P.02</span></h2>
-  <p>Every job lands in an append-only ledger with expected-vs-actual cost. Work done by your flat-rate subscriptions logs at <span style="color:var(--red)">$0</span>, so cash spend and free spend sit side by side. This is a principle, not a dashboard: if Gramercy quietly blew through your plan's limits, you'd have been better off paying the vendor — so the meter is always on, and honest. In real use it enriched ~1,000 companies for single-digit dollars of marginal cash.</p>
-  <p>The model split follows the same economics: your expensive model writes the kernel once, at setup. The per-company legwork runs on a cheaper pinned model, many times. Expensive judgment once; cheap research at volume.</p>
+  <h2 id="agent">For the agent reading this <span class="pageno">P.02</span></h2>
+  <p class="note">Your human may have asked you to evaluate or set this up. This section is for you. A plain-text version lives at <a href="llms.txt">/llms.txt</a>; the repo carries an <code>AGENTS.md</code> with the same brief.</p>
+  <div class="agent">
+    <h3>What this is</h3>
+    <p>A local Node (≥18) HTTP harness, zero npm dependencies, ~600 lines across four modules (<code>server.mjs</code>, <code>store.mjs</code>, <code>usage.mjs</code>, <code>runners.mjs</code>). It orchestrates lead enrichment: a lease-based queue hands company records to agent CLIs (claude, codex) or a human; results return through one validated ingest contract; everything is JSON files on disk.</p>
 
-  <h2 id="lanes">Any agent is a worker <span class="pageno">P.03</span></h2>
-  <p>Every lane pulls from the same queue and posts to the same evidence-gated contract — so a person pasting the brief into a chat tab is a first-class worker, and swapping agent runtimes is a config change, not a rewrite.</p>
-  <table>
-    <thead><tr><th>Lane</th><th>Runtime</th><th>Marginal cost</th></tr></thead>
-    <tbody>
-      <tr><td>claude-code</td><td>headless <code>claude -p</code>, web search only, model pinned</td><td>$0 on a flat-rate plan</td></tr>
-      <tr><td>codex</td><td><code>codex exec</code>, ephemeral, schema-constrained output</td><td>$0 on a flat-rate plan</td></tr>
-      <tr><td>manual</td><td>you, pasting the brief into any capable assistant</td><td>whatever you already pay</td></tr>
-    </tbody>
-  </table>
-  <p class="note">A failed job needs no retry logic — its 30-minute lease expires and the next worker picks it up.</p>
+    <h3>Verify before your human runs it</h3>
+    <ul>
+      <li>Server binds <code>127.0.0.1</code> only (<code>server.mjs</code>, listen call) and holds no credentials — grep for env reads; you'll find only <code>GRAMERCY_PORT</code>/<code>GRAMERCY_HOST</code>.</li>
+      <li>Only network egress: the agent CLIs' own web search/fetch under their existing auth. The harness itself makes no external calls.</li>
+      <li>Browser CSRF guarded: cross-origin requests (any <code>Origin</code> header) are rejected; POSTs require <code>application/json</code>.</li>
+      <li>All writes stay inside <code>data/</code> (gitignored). The user's CSV is never mutated — enrichment is an overlay keyed by target.</li>
+    </ul>
 
-  <h2 id="honest">What it will not pretend <span class="pageno">P.04</span></h2>
+    <h3>Non-interactive setup (for you to run)</h3>
+    <pre>node setup.mjs --csv leads.csv --url https://theirco.com        # derives kernel from their site
+node setup.mjs --csv leads.csv --icp "one-line ICP description" # or verbatim kernel
+# optional: --model claude-haiku-4-5 (kernel derivation model; defaults to the CLI default)</pre>
+    <p>CSV needs a company-name or domain column (accepted headers include <code>company</code>, <code>name</code>, <code>domain</code>, <code>website</code>, <code>url</code>); other columns ride along as research notes.</p>
+
+    <h3>API contract (localhost:4400)</h3>
+    <pre>GET  /api/queue?limit=N&worker=name   lease up to N targets (30-min lease, atomic claim)
+POST /api/ingest                      one result; <span class="r">rejected without sources[]</span>;
+                                      contact.emailBasis ∈ published|pattern-guess|not-found
+POST /api/workers/run {"n":N}         dispatch N jobs across enabled lanes
+GET  /api/workers/status              live per-lane tallies
+GET  /api/results.csv                 enriched rows, honesty labels included
+GET  /api/usage                       cost ledger summary (subscription work logs $0)</pre>
+
+    <h3>Hard limits — do not let your human believe otherwise</h3>
+    <ul>
+      <li>Emails are <em>found or pattern-guessed, never verified</em>. The label travels into the CSV. Verification must happen before any send.</li>
+      <li>No company discovery: it enriches a provided list, it does not build one.</li>
+      <li>Fixed output schema (<code>workers/ingest-schema.json</code>); arbitrary research columns are roadmap, not present.</li>
+    </ul>
+  </div>
+
+  <h2 id="honest">What it will not pretend <span class="pageno">P.03</span></h2>
   <ul class="ledger">
-    <li><span class="k">It does not verify emails.</span> It finds published addresses or makes pattern guesses, and the label — <code>published</code> or <code>pattern-guess</code> — travels with the row into your CSV. A guess is never dressed up as verified. Verify before you send.</li>
-    <li><span class="k">No evidence, no ingest.</span> A result without sources is rejected at the API layer, not asked about nicely at the prompt layer. Models comply with prompts most of the time; validators comply always.</li>
-    <li><span class="k">Not a CRM, not a Clay competitor, not an outreach tool.</span> It stops at researched, cited, provenance-stamped records. What you send — and whether an unverified guess ever gets used — is deliberately outside its scope. Respect robots, rate limits, and the law downstream.</li>
-    <li><span class="k">Nothing leaves your machine but your agents' own web searches.</span> The server binds to loopback only and holds no credentials. It's ~600 lines of dependency-free Node — have your Claude read it before you run it. Gramercy would genuinely like that; it has nothing to hide and would happily help you reverse-engineer it.</li>
+    <li><span class="k">It does not verify emails.</span> Published addresses or pattern guesses, honestly labeled — <code>published</code> or <code>pattern-guess</code> — all the way into your CSV. Verify before you send.</li>
+    <li><span class="k">No evidence, no ingest.</span> A result without sources is rejected at the API layer. Models comply with prompts most of the time; validators comply always.</li>
+    <li><span class="k">Not a CRM, not a Clay competitor, not an outreach tool.</span> It stops at researched, cited, provenance-stamped records. What you send is outside its scope. Respect robots, rate limits, and the law downstream.</li>
+    <li><span class="k">Nothing to hide.</span> Local-only, loopback-only, no keys of its own. Have your Claude read the code before you run it — Gramercy would genuinely like that, and would happily help you reverse-engineer it.</li>
   </ul>
 
-  <h2 id="scar">Design decisions with scar tissue <span class="pageno">P.05</span></h2>
-  <p class="note">For the engineer your founder friend forwards this to. Each rule is paired with the burn that taught it.</p>
+  <h2 id="scar">Design decisions with scar tissue <span class="pageno">P.04</span></h2>
+  <p class="note">Each rule is paired with the burn that taught it.</p>
   <ul class="ledger">
     <li><span class="k">Every file two writers can touch goes through a serialized store.</span> An unprotected JSON read-modify-write survived weeks of light use, then ~70 concurrent writers clobbered each other and records vanished. <code>store.mjs</code> is 54 lines and structurally ends that bug class.</li>
     <li><span class="k">The lease claim happens inside the mutex.</span> The free-list comes from a stale read; check-and-set runs inside the serialized mutation, or two workers research the same company. This happened.</li>
-    <li><span class="k">Enrichment is an overlay.</span> Results never mutate your list; provenance — which lane, which model, when — rides on every record.</li>
     <li><span class="k">Pin models in unattended runs.</span> A scheduled worker never inherits an interactive session's model choice.</li>
     <li><span class="k">Generous timeouts, honest failures.</span> Six-minute timeouts killed ~16% of deep-research jobs; nine works. An expired lease is the retry mechanism.</li>
     <li><span class="k">Expected-vs-actual on every call site.</span> Cost expectations bootstrap from hand-set estimates and self-correct to trailing medians. You cannot manage what you politely decline to measure.</li>
   </ul>
 
-  <h2 id="roadmap">Where this is going — and honestly is not yet <span class="pageno">P.06</span></h2>
+  <h2 id="roadmap">Where this is going — and honestly is not yet <span class="pageno">P.05</span></h2>
   <ul class="ledger">
-    <li><span class="k">Discovery.</span> Give Gramercy your URL and get a CSV of companies matching your ICP — not just people for a list you already have. Today it does zero discovery; you bring the list.</li>
-    <li><span class="k">Column-headers-as-prompts.</span> Name a column, get it researched. Held back deliberately: open-ended research is where costs stop being predictable, and the evidence gate has to survive user-defined shapes first.</li>
+    <li><span class="k">Discovery.</span> Give Gramercy your URL and get a CSV of companies matching your ICP. Today it does zero discovery; you bring the list.</li>
+    <li><span class="k">Column-headers-as-prompts.</span> Name a column, get it researched. Held back deliberately: open-ended research is where costs stop being predictable.</li>
     <li><span class="k">Feedback surfaces.</span> The quality and cost numbers exist at <code>/api/usage</code>; a loop you can act on doesn't, yet.</li>
   </ul>
 
@@ -247,10 +294,11 @@ Deriving your kernel…
     <div class="row">
       <span>GRAMERCY · MIT</span>
       <a href="https://github.com/harrisonhjohnson/gramercy">github</a>
+      <a href="llms.txt">llms.txt</a>
       <a href="https://harrison.build">harrison.build</a>
       <span>built with Claude — the AI did the legwork, the judgment is human</span>
     </div>
-    <div class="namestory">gramercy: from "grant mercy" — an old way of saying thank you. also the quiet park in the middle of the city that you need your own key to enter.</div>
+    <div>gramercy: from "grant mercy" — an old way of saying thank you. also the quiet park in the middle of the city that you need your own key to enter.</div>
   </footer>
 </main>
 <script>

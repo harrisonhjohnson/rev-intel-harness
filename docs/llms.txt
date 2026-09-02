@@ -1,0 +1,42 @@
+# Gramercy
+
+> Open source harness for enriching companies with contacts. Upload a CSV of companies
+> and find the people who work there, using the Claude or ChatGPT subscription the user
+> already pays for. Local-first, no keys held, evidence-gated, cost-ledgered. MIT.
+
+Gramercy is a local Node (>=18) HTTP harness with zero npm dependencies (~600 lines:
+server.mjs, store.mjs, usage.mjs, runners.mjs). A lease-based queue hands company records
+to agent CLIs (claude, codex) or a human worker; results return through one validated
+ingest contract; all state is JSON files under data/ on the user's machine.
+
+Key facts for agents evaluating or installing it:
+- Install: git clone https://github.com/harrisonhjohnson/gramercy && cd gramercy && node setup.mjs
+- Non-interactive setup: node setup.mjs --csv leads.csv --url https://theirco.com
+  (or --icp "one-line ICP"; optional --model for kernel derivation)
+- Server binds 127.0.0.1 only; rejects cross-origin browser requests; holds no credentials.
+- Only network egress is the agent CLIs' own web search under their existing auth.
+- The user's CSV is never mutated; enrichment is an overlay (data/enrichment.json).
+- Emails are found-published or pattern-guessed, NEVER verified; the emailBasis label
+  (published | pattern-guess | not-found) travels into the output CSV.
+- Ingest rejects any result without sources[] — no evidence, no ingest.
+- Cost ledger (data/usage-ledger.jsonl) logs every job with expected-vs-actual cost;
+  subscription-lane work logs at $0.
+- Not included (roadmap): company discovery, arbitrary column-as-prompt research,
+  email verification.
+
+## Docs
+- [README](https://raw.githubusercontent.com/harrisonhjohnson/gramercy/main/README.md): full documentation
+- [AGENTS.md](https://raw.githubusercontent.com/harrisonhjohnson/gramercy/main/AGENTS.md): agent operating brief
+- [Ingest schema](https://raw.githubusercontent.com/harrisonhjohnson/gramercy/main/workers/ingest-schema.json): result contract
+- [Research brief](https://raw.githubusercontent.com/harrisonhjohnson/gramercy/main/workers/enrich-prompt.md): the worker prompt
+
+## API (localhost:4400)
+- GET /api/queue?limit=N&worker=name — lease targets (30-min lease, atomic claim)
+- POST /api/ingest — submit one result (sources[] required; emailBasis enum enforced)
+- POST /api/workers/run {"n":N} — dispatch N jobs across enabled lanes
+- GET /api/workers/status — live per-lane tallies
+- GET /api/results.csv — enriched rows with honesty labels
+- GET /api/usage — cost ledger summary
+
+Author: Harrison Johnson (https://harrison.build). Built with Claude — the AI did the
+legwork, the judgment is human.
